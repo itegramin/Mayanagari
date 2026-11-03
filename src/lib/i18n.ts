@@ -1,0 +1,135 @@
+import { cookies } from "next/headers";
+
+export type Locale = "en" | "hi";
+
+const messages = {
+  en: {
+    name: "Mayanagari",
+    tagline: "A city of a thousand stories",
+    subtitle: "Your next story begins at the crossroads.",
+    enter: "Enter the city",
+    join: "Create an account",
+    signIn: "Sign in",
+    signUp: "Create your traveller",
+    email: "Email address",
+    password: "Password",
+    displayName: "Display name",
+    city: "The city",
+    character: "Your traveller",
+    energy: "Energy",
+    nerve: "Nerve",
+    health: "Health",
+    rupees: "Rupees",
+    experience: "Experience",
+    level: "Level",
+    inventory: "Your satchel",
+    activities: "Things to do",
+    map: "Neighbourhoods",
+    factions: "Guild halls",
+    market: "The bazaar",
+    chat: "City square",
+    pvp: "Friendly challenge",
+    recentMessages: "Latest conversations",
+    signOut: "Leave the city",
+    language: "हिन्दी",
+    loading: "Loading...",
+    noCharacter: "Your traveller is not ready yet.",
+    cityIntro: "A fictional city woven from busy bazaars, monsoon evenings, neighbourhood art, shared meals, and many languages.",
+    signedIn: "You are signed in. Your city is waiting.",
+    location: "You are in",
+    itemsEmpty: "Your satchel is empty.",
+    noFactions: "No guild halls yet. Start one or join a neighbour's.",
+    createFaction: "Start a guild hall",
+    joinFaction: "Join",
+    move: "Travel",
+    act: "Begin",
+    listItem: "List an item",
+    buy: "Buy",
+    attack: "Challenge",
+    send: "Send",
+    report: "Report",
+    createAccountHint: "New here? Make a traveller account to save your story.",
+    welcome: "Welcome back",
+    welcomeNew: "Welcome to Mayanagari",
+    cityLore: "From the printmakers of Rangmahal to the evening readers in Neem Gardens, every corner has its own rhythm.",
+    cityName: "Mayanagari",
+    rupeeSymbol: "₹",
+    noActivities: "No activities are available in this neighbourhood.",
+    channelName: "City Square",
+  },
+  hi: {
+    name: "मायानगरी",
+    tagline: "हज़ार कहानियों का शहर",
+    subtitle: "आपकी अगली कहानी चौराहे से शुरू होती है।",
+    enter: "शहर में आएँ",
+    join: "खाता बनाएँ",
+    signIn: "प्रवेश करें",
+    signUp: "अपना मुसाफ़िर बनाएँ",
+    email: "ईमेल पता",
+    password: "पासवर्ड",
+    displayName: "नाम",
+    city: "शहर",
+    character: "आपका मुसाफ़िर",
+    energy: "ऊर्जा",
+    nerve: "हौसला",
+    health: "सेहत",
+    rupees: "रुपये",
+    experience: "अनुभव",
+    level: "स्तर",
+    inventory: "आपकी झोली",
+    activities: "आज के काम",
+    map: "मोहल्ले",
+    factions: "मंडली के ठिकाने",
+    market: "रौनक़ बाज़ार",
+    chat: "नगर चौक",
+    pvp: "दोस्ताना चुनौती",
+    recentMessages: "हाल की बातचीत",
+    signOut: "शहर से विदा लें",
+    language: "English",
+    loading: "लोड हो रहा है...",
+    noCharacter: "आपका मुसाफ़िर अभी तैयार नहीं है।",
+    cityIntro: "एक काल्पनिक शहर, जहाँ चहल-पहल वाले बाज़ार, मानसून की शामें, मोहल्ले की कला, साथ के भोजन और अनेक भाषाएँ मिलती हैं।",
+    signedIn: "आपने प्रवेश कर लिया है। शहर आपका इंतज़ार कर रहा है।",
+    location: "आप यहाँ हैं",
+    itemsEmpty: "आपकी झोली अभी खाली है।",
+    noFactions: "अभी कोई मंडली नहीं है। अपनी बनाएँ या किसी पड़ोसी से जुड़ें।",
+    createFaction: "मंडली शुरू करें",
+    joinFaction: "जुड़ें",
+    move: "सफ़र करें",
+    act: "शुरू करें",
+    listItem: "सामान बेचने रखें",
+    buy: "ख़रीदें",
+    attack: "मुक़ाबले की चुनौती",
+    send: "भेजें",
+    report: "शिकायत",
+    createAccountHint: "नए हैं? अपनी कहानी सँजोने के लिए मुसाफ़िर का खाता बनाएँ।",
+    welcome: "वापसी पर स्वागत है",
+    welcomeNew: "मायानगरी में आपका स्वागत है",
+    cityLore: "रंगमहल के छापेख़ानों से नीम के बाग़ में शाम के पाठकों तक, हर कोने की अपनी लय है।",
+    cityName: "मायानगरी",
+    rupeeSymbol: "₹",
+    noActivities: "इस मोहल्ले में अभी कोई काम उपलब्ध नहीं है।",
+    channelName: "नगर चौक",
+  },
+} as const;
+
+export type Messages = (typeof messages)[Locale];
+
+export async function getLocale(): Promise<Locale> {
+  const cookieStore = await cookies();
+  return cookieStore.get("maya_locale")?.value === "hi" ? "hi" : "en";
+}
+
+export function getMessages(locale: Locale): Messages {
+  return messages[locale];
+}
+
+export function localizedText(
+  locale: Locale,
+  value: { name_en?: string; name_hi?: string; description_en?: string; description_hi?: string },
+  field: "name" | "description",
+): string {
+  const key = `${field}_${locale}` as const;
+  const fallbackKey = `${field}_en` as const;
+  return value[key] ?? value[fallbackKey] ?? "";
+}
