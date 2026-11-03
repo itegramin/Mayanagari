@@ -108,42 +108,86 @@ export function GameDashboard(props: Props) {
         </Link>
         <div className="top-actions">
           <LanguageToggle locale={locale} label={messages.language} />
-          <form action={signOutAction}><button className="button-quiet" type="submit">{messages.signOut}</button></form>
+          <details className="profile-menu">
+            <summary className="profile-trigger" aria-label={locale === "hi" ? "मुसाफ़िर का मेनू" : "Traveller profile menu"}>
+              <span className="profile-avatar" aria-hidden="true">{props.displayName.trim().slice(0, 1).toLocaleUpperCase(locale === "hi" ? "hi-IN" : "en-IN")}</span>
+              <span className="profile-trigger-name">{props.displayName}</span>
+              <span className="profile-chevron" aria-hidden="true">⌄</span>
+            </summary>
+            <div className="profile-dropdown">
+              <div className="profile-summary">
+                <strong>{props.displayName}</strong>
+                <span>{state.character.name} · {messages.level} {formatNumber(state.character.level, locale)}</span>
+                <span>{currentLocationName}</span>
+              </div>
+              <a className="profile-link" href="#traveller">{locale === "hi" ? "मुसाफ़िर का परिचय" : "View traveller profile"}</a>
+              <form action={signOutAction}>
+                <button className="profile-sign-out" type="submit">{messages.signOut}</button>
+              </form>
+            </div>
+          </details>
         </div>
       </header>
 
-      <section className="dashboard-hero">
-        <span className="eyebrow">{messages.location} · {currentLocationName}</span>
-        <h1>{messages.welcome}, {props.displayName}</h1>
-        <p>{messages.cityLore}</p>
-      </section>
-
-      <nav className="game-nav" aria-label="Game sections">
-        <a href="#traveller">{messages.character}</a>
-        <a href="#neighbourhoods">{messages.map}</a>
-        <a href="#activities">{messages.activities}</a>
-        <a href="#guilds">{messages.factions}</a>
-        <a href="#bazaar">{messages.market}</a>
-        <a href="#square">{messages.chat}</a>
-        <a href="#challenge">{messages.pvp}</a>
-      </nav>
-
       <div className="dashboard-grid">
-        <div className="main-column">
-          <section className="card" id="traveller">
+        <aside className="dashboard-sidebar">
+          <section className="card sidebar-status" aria-label={locale === "hi" ? "मुसाफ़िर के आँकड़े" : "Traveller stats"}>
             <div className="eyebrow">{messages.character}</div>
             <h2>{state.character.name}</h2>
-            <p className="card-intro">{currentLocationDescription}</p>
-            <div className="stats-grid">
+            <div className="sidebar-stats">
               <StatBar label={messages.energy} value={state.stats.energy} capacity={state.stats.energy_capacity} kind="energy" />
               <StatBar label={messages.nerve} value={state.stats.nerve} capacity={state.stats.nerve_capacity} kind="nerve" />
               <StatBar label={messages.health} value={state.stats.health} capacity={state.stats.health_capacity} kind="health" />
             </div>
-            <div className="wallet-strip">
-              <span>{messages.level}: <strong>{formatNumber(state.character.level, locale)}</strong></span>
-              <span>{messages.experience}: <strong>{formatNumber(state.character.experience, locale)}</strong></span>
-              <span>{messages.rupees}: <strong>{messages.rupeeSymbol}{formatNumber(state.wallet.balance, locale)}</strong></span>
+            <dl className="sidebar-wallet">
+              <div><dt>{messages.level}</dt><dd>{formatNumber(state.character.level, locale)}</dd></div>
+              <div><dt>{messages.experience}</dt><dd>{formatNumber(state.character.experience, locale)}</dd></div>
+              <div><dt>{messages.rupees}</dt><dd>{messages.rupeeSymbol}{formatNumber(state.wallet.balance, locale)}</dd></div>
+            </dl>
+          </section>
+
+          <nav className="game-nav" aria-label={locale === "hi" ? "खेल के हिस्से" : "Game sections"}>
+            <span className="sidebar-heading">{locale === "hi" ? "शहर में जाएँ" : "Explore the city"}</span>
+            <a href="#traveller"><span aria-hidden="true">◉</span>{messages.character}</a>
+            <a href="#neighbourhoods"><span aria-hidden="true">⌖</span>{messages.map}</a>
+            <a href="#activities"><span aria-hidden="true">✦</span>{messages.activities}</a>
+            <a href="#inventory"><span aria-hidden="true">▣</span>{messages.inventory}</a>
+            <a href="#guilds"><span aria-hidden="true">⌂</span>{messages.factions}</a>
+            <a href="#bazaar"><span aria-hidden="true">₹</span>{messages.market}</a>
+            <a href="#square"><span aria-hidden="true">◌</span>{messages.chat}</a>
+            <a href="#challenge"><span aria-hidden="true">⚔</span>{messages.pvp}</a>
+            {props.isModerator && <a href="#moderation"><span aria-hidden="true">◇</span>{locale === "hi" ? "संचालन" : "Moderation"}</a>}
+          </nav>
+        </aside>
+
+
+        <div className="main-column">
+          <section className="dashboard-hero">
+            <span className="eyebrow">{messages.location} · {currentLocationName}</span>
+            <h1>{messages.welcome}, {props.displayName}</h1>
+            <p>{messages.cityLore}</p>
+          </section>
+          <section className="card" id="traveller">
+            <div className="overview-heading">
+              <div>
+                <div className="eyebrow">{locale === "hi" ? "यात्री की जानकारी" : "Traveller overview"}</div>
+                <h2>{state.character.name}</h2>
+              </div>
+              <span className="overview-level">{messages.level} {formatNumber(state.character.level, locale)}</span>
             </div>
+            <p className="card-intro">{currentLocationDescription}</p>
+            <dl className="overview-table">
+              <div><dt>{locale === "hi" ? "नाम" : "Name"}</dt><dd>{state.character.name}</dd></div>
+              <div><dt>{messages.location}</dt><dd>{currentLocationName}</dd></div>
+              <div><dt>{messages.rupees}</dt><dd>{messages.rupeeSymbol}{formatNumber(state.wallet.balance, locale)}</dd></div>
+              <div><dt>{messages.experience}</dt><dd>{formatNumber(state.character.experience, locale)}</dd></div>
+              <div>
+                <dt>{messages.factions}</dt>
+                <dd>{currentFactions.length > 0
+                  ? (locale === "hi" ? currentFactions[0].name_hi : currentFactions[0].name)
+                  : (locale === "hi" ? "अभी किसी मंडली में नहीं" : "Not in a guild hall yet")}</dd>
+              </div>
+            </dl>
           </section>
 
           <section className="card" id="neighbourhoods">
@@ -232,7 +276,7 @@ export function GameDashboard(props: Props) {
           </section>
 
           {props.isModerator && (
-            <section className="card">
+            <section className="card" id="moderation">
               <div className="eyebrow">{locale === "hi" ? "संचालन" : "Moderation"}</div>
               <h2>{locale === "hi" ? "समीक्षा की प्रतीक्षा" : "Open chat reports"}</h2>
               {moderationReports.length === 0 && (
@@ -256,7 +300,54 @@ export function GameDashboard(props: Props) {
         </div>
 
         <aside className="side-column">
-          <section className="card">
+          <section className="card neighbourhood-card" id="current-location">
+            <div className="eyebrow">{locale === "hi" ? "आपका मोहल्ला" : "Your neighbourhood"}</div>
+            <h2>{currentLocationName}</h2>
+            <div className="neighbourhood-art" aria-hidden="true">
+              <svg viewBox="0 0 480 190" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label={locale === "hi" ? "मायानगरी के मोहल्ले का दृश्य" : "Illustration of a Mayanagari neighbourhood"}>
+                <circle cx="370" cy="47" r="28" fill="#E8BB64" />
+                <path d="M0 151C73 125 111 143 174 130C247 115 320 147 480 114V190H0V151Z" fill="#B8D3B6" />
+                <path d="M39 152V82H116V152M49 82V64H106V82M59 64Q78 33 97 64" fill="#E9C681" stroke="#285D56" strokeWidth="4" />
+                <path d="M139 151V55H233V151M150 55V37H221V55M164 37Q186 2 207 37" fill="#D68A54" stroke="#285D56" strokeWidth="4" />
+                <path d="M252 151V91H319V151M261 91V75H310V91M272 75Q285 53 299 75" fill="#C7D9BE" stroke="#285D56" strokeWidth="4" />
+                <path d="M337 151V70H442V151M348 70V50H431V70M366 50Q389 19 413 50" fill="#E9C681" stroke="#285D56" strokeWidth="4" />
+                <path d="M0 153H480" stroke="#285D56" strokeWidth="5" strokeLinecap="round" />
+                <path d="M15 174C94 160 161 182 245 167C324 153 393 175 470 158" stroke="#C55D30" strokeWidth="4" strokeDasharray="3 12" strokeLinecap="round" />
+                <circle cx="72" cy="108" r="4" fill="#C55D30" /><circle cx="91" cy="108" r="4" fill="#C55D30" />
+                <circle cx="176" cy="83" r="4" fill="#285D56" /><circle cx="201" cy="83" r="4" fill="#285D56" />
+                <circle cx="377" cy="97" r="4" fill="#C55D30" /><circle cx="402" cy="97" r="4" fill="#C55D30" />
+              </svg>
+            </div>
+            <p className="card-intro">{currentLocationDescription}</p>
+            <a className="text-link" href="#neighbourhoods">{locale === "hi" ? "शहर के मोहल्ले देखें" : "Explore neighbourhoods"} <span aria-hidden="true">→</span></a>
+          </section>
+
+          <section className="card latest-messages">
+            <div className="widget-heading">
+              <div>
+                <div className="eyebrow">{messages.chat}</div>
+                <h2>{locale === "hi" ? "चौक की ताज़ा बातें" : "Latest from the square"}</h2>
+              </div>
+              <a className="widget-more" href="#square" aria-label={locale === "hi" ? "सारी बातचीत देखें" : "View all conversations"}>→</a>
+            </div>
+            {messagesInChat.length === 0
+              ? <p className="empty">{locale === "hi" ? "चौक पर अभी ख़ामोशी है।" : "The square is quiet for now."}</p>
+              : messagesInChat.slice(-3).reverse().map((message) => (
+                <article className="message-preview" key={message.id}>
+                  <div className="message-preview-meta">
+                    <strong>{characterNames[message.character_id] ?? (locale === "hi" ? "मुसाफ़िर" : "Traveller")}</strong>
+                    <time dateTime={message.created_at}>
+                      {new Intl.DateTimeFormat(locale === "hi" ? "hi-IN" : "en-IN", {
+                        hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata",
+                      }).format(new Date(message.created_at))}
+                    </time>
+                  </div>
+                  <p>{message.body}</p>
+                </article>
+              ))}
+          </section>
+
+          <section className="card" id="inventory">
             <div className="eyebrow">{messages.inventory}</div>
             <h2>{messages.inventory}</h2>
             {state.inventory.length === 0 && <p className="empty">{messages.itemsEmpty}</p>}
